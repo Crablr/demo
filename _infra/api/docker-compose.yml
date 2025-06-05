@@ -1,0 +1,15 @@
+services:
+  api:
+    image: registry.gitlab.com/crablr/demo/api:latest-release
+    environment:
+      VIRTUAL_HOST: demo-api.crablr.io
+      LETSENCRYPT_HOST: demo-api.crablr.io
+      LETSENCRYPT_EMAIL: security@crablr.io
+    env_file: "api.env"
+    networks:
+      - nginx-proxy
+
+networks:
+  nginx-proxy:
+    external: true
+    name: nginx-proxy_default

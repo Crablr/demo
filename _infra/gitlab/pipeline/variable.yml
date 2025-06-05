@@ -1,0 +1,30 @@
+.debug: &debug
+  - |
+    echo "___________DEBUG___________"
+    echo CI_COMMIT_SHA=$CI_COMMIT_SHA
+    echo CI_PIPELINE_SOURCE=$CI_PIPELINE_SOURCE
+    echo CI_COMMIT_BRANCH=$CI_COMMIT_BRANCH
+    echo CI_MERGE_REQUEST_SOURCE_BRANCH_NAME=$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    echo CI_COMMIT_REF_PROTECTED=$CI_COMMIT_REF_PROTECTED
+    echo CI_COMMIT_REF_NAME=$CI_COMMIT_REF_NAME
+    echo CI_COMMIT_REF_SLUG=$CI_COMMIT_REF_SLUG
+    echo CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
+    echo GITLAB_AGENT=$GITLAB_AGENT
+    echo ENVIRONMENT=$ENVIRONMENT
+    echo RELEASE_VERSION=$RELEASE_VERSION
+    echo DOCKER_TLS_CERTDIR=$DOCKER_TLS_CERTDIR
+    echo "___________________________"
+
+.computed-vars: &computed-vars
+  - ENVIRONMENT=$(if [[ $CI_COMMIT_REF_NAME == *"release"* ]]; then echo "release"; elif [[ $CI_COMMIT_REF_NAME == *"staging"* ]]; then echo "staging"; else echo "develop"; fi)
+  - RELEASE_VERSION=$(echo $CI_COMMIT_REF_NAME | grep -oP -- '-\K\d+\.\d+\.\d+' || echo $CI_COMMIT_SHA)
+
+.custom-vars:
+  - apk add grep
+  - set -a
+  - source $GROUP_VARS_INFRA || true
+  - source $GROUP_VARS_FRONT || true
+  - DOCKER_TLS_CERTDIR="/certs"
+  - *computed-vars
+  - set +a
+  - *debug

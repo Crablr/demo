@@ -1,0 +1,12 @@
+{
+  "projects": {},
+  "targets": {
+    "crablr": {
+      "hosting": {
+        "web": [
+          "showcase-crablr"
+        ]
+      }
+    }
+  }
+}

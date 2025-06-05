@@ -1,0 +1,18 @@
+{
+  "extends": "@repo/codebase-config/tsconfig-nextjs.json",
+  "compilerOptions": {
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@web/*": ["./src/*"],
+      "@api/*": ["../api/src/*"]
+    }
+  },
+  "include": [
+    "global.d.ts",
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}

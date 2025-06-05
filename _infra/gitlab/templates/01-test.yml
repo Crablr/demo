@@ -1,0 +1,62 @@
+.lint-nextjs:
+  image: node:24.8.0-alpine3.22
+  needs: []
+  stage: test
+  cache:
+    - key:
+        files:
+          - package-lock.json
+      paths:
+        - node_modules/
+  before_script:
+    - cd $SRC_PATH
+    - apk add jq
+    # Reduce a lot node_modules by installing only mandatory deps for linting
+    - |
+      reducedPackage=$(cat package.json | jq '
+        .scripts |= {lint: .lint} |
+        .dependencies |= {} |
+        .devDependencies |= {
+          eslint: .eslint,
+          "@eslint/js": .["@eslint/js"],
+          "@typescript-eslint/eslint-plugin": .["@typescript-eslint/eslint-plugin"],
+          "@next/eslint-plugin-next": .["@next/eslint-plugin-next"],
+          "@repo/codebase-config": .["@repo/codebase-config"],
+          prettier: .prettier
+        }
+      ')
+    - printf "$reducedPackage\n" > package.json
+    - npm ci --ignore-scripts
+  script:
+    - npm run lint
+
+.lint-service:
+  image: node:24.8.0-alpine3.22
+  needs: []
+  stage: test
+  cache:
+    - key:
+        files:
+          - package-lock.json
+      paths:
+        - node_modules/
+  before_script:
+    - cd $SRC_PATH
+    - apk add jq
+    # Reduce a lot node_modules by installing only mandatory deps for linting
+    - |
+      reducedPackage=$(cat package.json | jq '
+        .scripts |= {lint: .lint} |
+        .dependencies |= {} |
+        .devDependencies |= {
+          eslint: .eslint,
+          "@eslint/js": .["@eslint/js"],
+          "@typescript-eslint/eslint-plugin": .["@typescript-eslint/eslint-plugin"],
+          "@repo/codebase-config": .["@repo/codebase-config"],
+          prettier: .prettier
+        }
+      ')
+    - printf "$reducedPackage\n" > package.json
+    - npm ci --ignore-scripts
+  script:
+    - npm run lint

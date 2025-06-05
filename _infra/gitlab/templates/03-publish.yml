@@ -1,0 +1,15 @@
+.publish-image:
+  image: docker:28.4.0-cli-alpine3.22
+  services:
+    - docker:28.4.0-dind
+  stage: publish
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+  script:
+    - !reference [".custom-vars"]
+    - docker tag $REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA $REGISTRY_IMAGE:latest-$ENVIRONMENT
+    - docker push $REGISTRY_IMAGE:latest-$ENVIRONMENT
+  environment:
+    name: $CI_COMMIT_REF_SLUG/$SERVICE_NAME
+    action: access

@@ -1,0 +1,15 @@
+image: alpine:3.22.1
+
+stages:
+  - test
+  - build
+  - publish
+  - deploy
+
+include:
+  - "_infra/gitlab/templates/01-test.yml"
+  - "_infra/gitlab/templates/02-build.yml"
+  - "_infra/gitlab/templates/03-publish.yml"
+  - "_infra/gitlab/templates/04-deploy.yml"
+  - "_infra/gitlab/pipeline/variable.yml"
+  - "_infra/gitlab/pipeline/services.yml"

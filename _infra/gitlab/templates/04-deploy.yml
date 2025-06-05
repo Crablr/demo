@@ -1,0 +1,30 @@
+.deploy-ssh:
+  stage: deploy
+  environment:
+    name: $CI_COMMIT_REF_SLUG/$SERVICE_NAME
+    action: access
+  before_script:
+    - apk add --no-cache openssh-client curl
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - !reference [".custom-vars"]
+    - ssh gitlab-publish@crablr.io
+
+.deploy-firebase:
+  image: node:24.8.0-alpine3.22
+  stage: deploy
+  before_script:
+    - apk update && apk add --no-cache curl python3
+    - npm i -g firebase-tools@13.4.1
+  script:
+    - !reference [".custom-vars"]
+    - cd apps
+    - firebase --project $FIREBASE_PROJECT_ID deploy --only hosting:$SERVICE_NAME --token $FIREBASE_DEPLOY_TOKEN
+  environment:
+    name: $CI_COMMIT_REF_SLUG/$SERVICE_NAME
+    action: access

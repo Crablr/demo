@@ -1,0 +1,55 @@
+.build-service:
+  image: docker:28.4.0-cli-alpine3.22
+  needs: []
+  stage: build
+  services:
+    - docker:28.4.0-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA || docker pull $REGISTRY_IMAGE:latest-develop || true
+  script:
+    - !reference [".custom-vars"]
+    - docker build
+      -f ./_infra/docker/$DOCKERFILE
+      --cache-from $REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+      --cache-from $REGISTRY_IMAGE:latest-develop
+      --build-arg SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+      --build-arg ENVIRONMENT=$ENVIRONMENT
+      --build-arg RELEASE=$CI_COMMIT_REF_NAME
+      --build-arg RELEASE_VERSION=$RELEASE_VERSION
+      --build-arg SERVICE=$SERVICE
+      --build-arg NPM_WORKSPACE=$NPM_WORKSPACE
+      --build-arg COMMIT=$CI_COMMIT_SHA
+      --build-arg COMMIT_TIMESTAMP=$CI_COMMIT_TIMESTAMP
+      --build-arg CI_COMMIT_REF_SLUG=$CI_COMMIT_REF_SLUG
+      -t $REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+      .
+    - docker push $REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+
+.build-client-nextjs:
+  needs: []
+  stage: build
+  image: node:24.8.0-alpine3.22
+  cache: []
+  variables:
+    NODE_ENV: production
+  artifacts:
+    paths:
+      - $SRC_PATH/out
+    expire_in: 1 week
+  before_script:
+    - apk update && apk add --no-cache curl python3
+    - cd $SRC_PATH
+    - npm ci --ignore-scripts
+  script:
+    - !reference [".custom-vars"]
+    - export NEXT_PUBLIC_ENVIRONMENT=$ENVIRONMENT
+    - export NEXT_PUBLIC_RELEASE=$CI_COMMIT_REF_SLUG
+    - export NEXT_PUBLIC_RELEASE_VERSION=$RELEASE_VERSION
+    - export NEXT_PUBLIC_COMMIT=$CI_COMMIT_SHA
+    - export NEXT_PUBLIC_COMMIT_DATE=$CI_COMMIT_TIMESTAMP
+    - npm run build
+    - find ./out -type f -name "*.js.map" -exec rm -f {} +
+  environment:
+    name: $CI_COMMIT_REF_SLUG/$SERVICE_NAME
+    action: prepare
