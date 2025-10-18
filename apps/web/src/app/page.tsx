@@ -112,7 +112,7 @@ export default function Demo() {
                     ${product.price}
                   </Typography>
                   <Button variant="contained" size="large" type="submit">
-                    Buy with Crypto
+                    Buy
                   </Button>
                 </Box>
               </CardContent>

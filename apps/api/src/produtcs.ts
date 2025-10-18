@@ -39,7 +39,7 @@ export const products: Record<string, IProduct> = {
     name: "Wireless Ergonomic Mouse",
     description:
       "Comfortable wireless mouse with adjustable DPI, ergonomic design, and precision tracking. Ideal for extended work sessions.",
-    price: 79.99,
+    price: 14.99,
     image:
       "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=300&fit=crop",
   },
