@@ -29,7 +29,8 @@ router.post("/product/:productId/checkout", async (req, res) => {
           subtitle: product.description,
         },
         unitPrice: {
-          usd: product.price,
+          currency: "usd",
+          amount: product.price,
         },
         quantity: 1,
       },
