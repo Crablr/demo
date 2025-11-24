@@ -13,7 +13,7 @@
     - chmod 644 ~/.ssh/known_hosts
   script:
     - !reference [".custom-vars"]
-    - ssh gitlab-publish@crablr.io
+    - ssh gitlab-publish@ssh.crablr.io
 
 .deploy-firebase:
   image: node:24.8.0-alpine3.22
