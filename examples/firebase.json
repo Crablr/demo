@@ -1,8 +1,8 @@
 {
   "hosting": [
     {
-      "target": "web",
-      "public": "web/out",
+      "target": "react_checkout_web",
+      "public": "react-checkout/web/out",
       "headers": [
         {
           "source": "**/*",

@@ -3,8 +3,8 @@
   "targets": {
     "crablr": {
       "hosting": {
-        "web": [
-          "showcase-crablr"
+        "react_checkout_web": [
+          "crablr-demo-react-checkout"
         ]
       }
     }

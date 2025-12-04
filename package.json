@@ -1,5 +1,5 @@
 {
-  "name": "crablr-demo",
+  "name": "crablr-examples",
   "private": true,
   "scripts": {
     "prepare": "husky"
@@ -16,9 +16,9 @@
   "engines": {
     "node": ">=23"
   },
-  "packageManager": "npm@11.4.1",
+  "packageManager": "yarn@1.22.22",
   "workspaces": [
-    "apps/*",
+    "examples/react-checkout/*",
     "packages/*"
   ]
 }

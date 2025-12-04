@@ -17,7 +17,7 @@
       --build-arg ENVIRONMENT=$ENVIRONMENT
       --build-arg RELEASE=$CI_COMMIT_REF_NAME
       --build-arg RELEASE_VERSION=$RELEASE_VERSION
-      --build-arg SERVICE=$SERVICE
+      --build-arg SRC_PATH=$SRC_PATH
       --build-arg NPM_WORKSPACE=$NPM_WORKSPACE
       --build-arg COMMIT=$CI_COMMIT_SHA
       --build-arg COMMIT_TIMESTAMP=$CI_COMMIT_TIMESTAMP
@@ -40,7 +40,7 @@
   before_script:
     - apk update && apk add --no-cache curl python3
     - cd $SRC_PATH
-    - npm ci --ignore-scripts
+    - yarn install --frozen-lockfile --ignore-scripts
   script:
     - !reference [".custom-vars"]
     - export NEXT_PUBLIC_ENVIRONMENT=$ENVIRONMENT
@@ -48,8 +48,5 @@
     - export NEXT_PUBLIC_RELEASE_VERSION=$RELEASE_VERSION
     - export NEXT_PUBLIC_COMMIT=$CI_COMMIT_SHA
     - export NEXT_PUBLIC_COMMIT_DATE=$CI_COMMIT_TIMESTAMP
-    - npm run build
+    - yarn run build
     - find ./out -type f -name "*.js.map" -exec rm -f {} +
-  environment:
-    name: $CI_COMMIT_REF_SLUG/$SERVICE_NAME
-    action: prepare

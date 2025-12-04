@@ -1,7 +1,7 @@
 import { createCrablrAdmin } from "@crablr/admin";
 import { Router } from "express";
 import { env } from "./env";
-import { products, IProduct } from "./produtcs";
+import { products, IProduct } from "./products";
 
 const crablrAdmin = createCrablrAdmin({
   apiKey: env.CRABLR_API_KEY,
