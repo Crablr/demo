@@ -1,0 +1,60 @@
+.watch-dirs:
+  web:
+    - examples/react-checkout/web/**/*
+  api:
+    - examples/react-checkout/api/**/*
+
+build-react-checkout-web:
+  extends: .build-client-nextjs
+  variables:
+    SERVICE_NAME: "react_checkout_web"
+    SRC_PATH: ./examples/react-checkout/web
+  rules:
+    - changes: !reference [".watch-dirs", "web"]
+
+deploy-react-checkout-web:
+  extends: .deploy-firebase
+  variables:
+    SERVICE_NAME: "react_checkout_web"
+  needs: ["build-react-checkout-web"]
+  rules:
+    - if: $CI_COMMIT_TAG =~ /release/
+      changes: !reference [".watch-dirs", "web"]
+      when: manual
+    - if: $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_REF_SLUG =~ /develop|staging/
+      changes: !reference [".watch-dirs", "web"]
+
+build-react-checkout-api:
+  extends: .build-service
+  variables:
+    SRC_PATH: ./examples/react-checkout/api
+    NPM_WORKSPACE: "@demo/react-checkout-api"
+    DOCKERFILE: microservice.dockerfile
+    REGISTRY_IMAGE: $CI_REGISTRY_IMAGE/react-checkout-api
+  rules:
+    - changes: !reference [".watch-dirs", "api"]
+
+publish-react-checkout-api:
+  extends: .publish-image
+  variables:
+    REGISTRY_IMAGE: $CI_REGISTRY_IMAGE/react-checkout-api
+  needs: ["build-react-checkout-api"]
+  rules:
+    - if: $CI_COMMIT_TAG =~ /release/
+      changes: !reference [".watch-dirs", "api"]
+      when: manual
+    - if: $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_REF_SLUG =~ /develop|staging/
+      changes: !reference [".watch-dirs", "api"]
+
+deploy-react-checkout-api:
+  extends: .deploy-ssh
+  variables:
+    SERVICE_NAME: "react_checkout_api"
+    REGISTRY_IMAGE: $CI_REGISTRY_IMAGE/react-checkout-api
+  needs: ["build-react-checkout-api", "publish-react-checkout-api"]
+  rules:
+    - if: $CI_COMMIT_TAG =~ /release/
+      changes: !reference [".watch-dirs", "api"]
+      when: manual
+    - if: $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_REF_SLUG =~ /develop|staging/
+      changes: !reference [".watch-dirs", "api"]

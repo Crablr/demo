@@ -5,7 +5,7 @@
   cache:
     - key:
         files:
-          - package-lock.json
+          - yarn.lock
       paths:
         - node_modules/
   before_script:
@@ -26,9 +26,9 @@
         }
       ')
     - printf "$reducedPackage\n" > package.json
-    - npm ci --ignore-scripts
+    - yarn install --frozen-lockfile --ignore-scripts
   script:
-    - npm run lint
+    - yarn run lint
 
 .lint-service:
   image: node:24.8.0-alpine3.22
@@ -37,7 +37,7 @@
   cache:
     - key:
         files:
-          - package-lock.json
+          - yarn.lock
       paths:
         - node_modules/
   before_script:
@@ -57,6 +57,6 @@
         }
       ')
     - printf "$reducedPackage\n" > package.json
-    - npm ci --ignore-scripts
+    - yarn install --frozen-lockfile --ignore-scripts
   script:
-    - npm run lint
+    - yarn run lint

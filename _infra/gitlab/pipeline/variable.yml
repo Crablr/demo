@@ -23,7 +23,7 @@
   - apk add grep
   - set -a
   - source $GROUP_VARS_INFRA || true
-  - source $GROUP_VARS_FRONT || true
+  - GROUP_VARS_FRONT=GROUP_VARS_FRONT_${SERVICE_NAME} && eval source "\$$GROUP_VARS_FRONT" || true
   - DOCKER_TLS_CERTDIR="/certs"
   - *computed-vars
   - set +a

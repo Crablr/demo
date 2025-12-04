@@ -10,6 +10,3 @@
     - !reference [".custom-vars"]
     - docker tag $REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA $REGISTRY_IMAGE:latest-$ENVIRONMENT
     - docker push $REGISTRY_IMAGE:latest-$ENVIRONMENT
-  environment:
-    name: $CI_COMMIT_REF_SLUG/$SERVICE_NAME
-    action: access

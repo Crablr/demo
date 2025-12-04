@@ -4,16 +4,16 @@ FROM node:24.8.0-alpine3.22 AS base
 FROM base AS deps
 
 ENV NODE_ENV=production
-ARG SERVICE
+ARG SRC_PATH
 ARG NPM_WORKSPACE
 
 WORKDIR /sources
-COPY ./package.json ./package-lock.json ./
-COPY ./apps/$SERVICE/package.json ./apps/$SERVICE/
+COPY ./package.json ./yarn.lock ./
+COPY $SRC_PATH/package.json $SRC_PATH/
 COPY ./packages/codebase-config/package.json ./packages/codebase-config/
 
-RUN npm ci --workspace=$NPM_WORKSPACE --ignore-scripts
-RUN mkdir -p ./apps/$SERVICE/node_modules
+RUN yarn workspace $NPM_WORKSPACE install --frozen-lockfile --ignore-scripts
+RUN mkdir -p $SRC_PATH/node_modules
 
 ## SERVICE - build
 FROM base AS runner
@@ -23,16 +23,16 @@ RUN apk add --no-cache \
         curl \
         python3
 
-ARG SERVICE
+ARG SRC_PATH
 ARG RELEASE_VERSION
 ARG SENTRY_AUTH_TOKEN
 
 COPY --from=deps ./sources/node_modules ./sources/node_modules
-COPY --from=deps ./sources/apps/$SERVICE/node_modules ./sources/apps/$SERVICE/node_modules
+COPY --from=deps ./sources/$SRC_PATH/node_modules ./sources/$SRC_PATH/node_modules
 
 COPY ./ ./sources
-WORKDIR /sources/apps/$SERVICE
-RUN npm run build
+WORKDIR /sources/$SRC_PATH
+RUN yarn run build
 
 ## SERVICE - start
 
@@ -51,5 +51,5 @@ ENV COMMIT_TIMESTAMP=$COMMIT_TIMESTAMP
 ENV CI_COMMIT_REF_SLUG=$CI_COMMIT_REF_SLUG
 
 EXPOSE 8080
-CMD ["npm", "run", "start"]
+CMD ["yarn", "run", "start"]
 HEALTHCHECK CMD wget -q --spider http://localhost:8080/ping || exit 1
