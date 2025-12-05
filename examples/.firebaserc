@@ -5,6 +5,9 @@
       "hosting": {
         "react_checkout_web": [
           "crablr-demo-react-checkout"
+        ],
+        "react_privy_web": [
+          "crablr-demo-react-privy"
         ]
       }
     }

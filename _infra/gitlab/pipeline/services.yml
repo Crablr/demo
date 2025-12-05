@@ -1,2 +1,3 @@
 include:
   - "_infra/gitlab/pipeline/examples/react-checkout.yml"
+  - "_infra/gitlab/pipeline/examples/react-privy.yml"

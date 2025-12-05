@@ -1,0 +1,60 @@
+.watch-dirs:
+  web:
+    - examples/react-privy/web/**/*
+  api:
+    - examples/react-privy/api/**/*
+
+build-react-privy-web:
+  extends: .build-client-nextjs
+  variables:
+    SERVICE_NAME: "react_privy_web"
+    SRC_PATH: ./examples/react-privy/web
+  rules:
+    - changes: !reference [".watch-dirs", "web"]
+
+deploy-react-privy-web:
+  extends: .deploy-firebase
+  variables:
+    SERVICE_NAME: "react_privy_web"
+  needs: ["build-react-privy-web"]
+  rules:
+    - if: $CI_COMMIT_TAG =~ /release/
+      changes: !reference [".watch-dirs", "web"]
+      when: manual
+    - if: $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_REF_SLUG =~ /develop|staging/
+      changes: !reference [".watch-dirs", "web"]
+
+build-react-privy-api:
+  extends: .build-service
+  variables:
+    SRC_PATH: ./examples/react-privy/api
+    NPM_WORKSPACE: "@demo/react-privy-api"
+    DOCKERFILE: microservice.dockerfile
+    REGISTRY_IMAGE: $CI_REGISTRY_IMAGE/react-privy-api
+  rules:
+    - changes: !reference [".watch-dirs", "api"]
+
+publish-react-privy-api:
+  extends: .publish-image
+  variables:
+    REGISTRY_IMAGE: $CI_REGISTRY_IMAGE/react-privy-api
+  needs: ["build-react-privy-api"]
+  rules:
+    - if: $CI_COMMIT_TAG =~ /release/
+      changes: !reference [".watch-dirs", "api"]
+      when: manual
+    - if: $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_REF_SLUG =~ /develop|staging/
+      changes: !reference [".watch-dirs", "api"]
+
+deploy-react-privy-api:
+  extends: .deploy-ssh
+  variables:
+    SERVICE_NAME: "react_privy_api"
+    REGISTRY_IMAGE: $CI_REGISTRY_IMAGE/react-privy-api
+  needs: ["build-react-privy-api", "publish-react-privy-api"]
+  rules:
+    - if: $CI_COMMIT_TAG =~ /release/
+      changes: !reference [".watch-dirs", "api"]
+      when: manual
+    - if: $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_REF_SLUG =~ /develop|staging/
+      changes: !reference [".watch-dirs", "api"]

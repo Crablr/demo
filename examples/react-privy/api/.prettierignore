@@ -1,0 +1,5 @@
+build
+package-lock.json
+generated
+ampli.json
+src/technical/amplitude/generated/index.ts

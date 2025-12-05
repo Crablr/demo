@@ -3,7 +3,7 @@
   before_script:
     - apk add --no-cache openssh-client curl
     - eval $(ssh-agent -s)
-    - SSH_PRIVATE_KEY=SSH_PRIVATE_KEY_${SERVICE_NAME} && eval echo "\$$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - SSH_PRIVATE_KEY=SSH_PRIVATE_KEY_${SERVICE_NAME} && eval cat "\$$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
